@@ -33,7 +33,7 @@ typedef struct s_scheduler
 }	t_scheduler;
 
 
-typedef struct s_simulation
+typedef struct s_info_simulation
 {
     int	number_of_coders;
     int	time_to_burnout;
@@ -43,10 +43,11 @@ typedef struct s_simulation
 	int number_of_compiles_required;
 	int dongle_cooldown;
 
-	t_coder *coders;
+	char scheduler;
 
-}   t_simulation;
+}   t_info_simulation;
 
 int error(char *error_msg);
-int args_parse(char **av);
-void get_init_info(char **av, t_node *info_list);
+int	args_parse(char **av);
+void    init_info_simulation(t_info_simulation *info_simulation, char **av);
+//void get_init_info(char **av, t_node *info_list);

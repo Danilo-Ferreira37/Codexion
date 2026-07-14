@@ -2,7 +2,8 @@
 
 int error(char *error_msg)
 {
-    return (fprintf(stderr, "Error: %s\n", error_msg));
+    fprintf(stderr, "Error: %s\n", error_msg);
+	return (-1);
 }
 
 static int error_in_num(char *arg)
@@ -10,8 +11,6 @@ static int error_in_num(char *arg)
 	int i;
 
 	i = 0;
-	if (!arg || !arg[0])
-		return (error("The program received a invalid number"));
 	if (arg[i] == '+' || arg[i] == '-')
 		i++;
 	if (!arg[i])
@@ -25,7 +24,6 @@ static int error_in_num(char *arg)
 	return (0);
 }
 
-
 int args_parse(char **av)
 {
     int i;
@@ -36,12 +34,12 @@ int args_parse(char **av)
 		if (error_in_num(av[i++]))
 			return (1);
     }
-	if (strcmp(av[i], "FIFO") && strcmp(av[i], "EDF"))
-		return error("The program received a invalid scheduling! (Must be 'FIFO' or 'EDF')");
+	if (strcmp(av[i], "fifo") && strcmp(av[i], "edf"))
+		return (error("The program received a invalid scheduling! (Must be exactly 'fifo' or 'edf')"));
 	return (0);
 }
 
-static t_node *create_node(void *value)
+/* static t_node *create_node(void *value)
 {
 	t_node *node;
 
@@ -71,4 +69,4 @@ int get_init_info(char **av, t_node *info_list)
 		if (node_add_back(av[i++], &info_list));
 			return (-1);
 
-}
+} */
