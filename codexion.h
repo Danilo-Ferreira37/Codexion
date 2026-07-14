@@ -6,7 +6,7 @@
 
 typedef struct s_node
 {
-	void		 *data;
+	void	*data;
 	struct s_node	*next;
 }				   t_node;
 
@@ -20,18 +20,16 @@ typedef struct s_dongle
 typedef struct s_coder
 {
 	int code_id;
+	t_dongle *left_dongle;
+	t_dongle *right_dongle;
+	struct s_coder *left_coder;
+	struct s_coder *right_coder;
+
 	int time_without_copile;
 	int total_copiles;
 	int	time_to_die;
-
+	pthread_t thread;
 }	t_coder;
-
-
-typedef struct s_scheduler
-{
-	char *type_scheduler;
-}	t_scheduler;
-
 
 typedef struct s_info_simulation
 {
@@ -50,4 +48,4 @@ typedef struct s_info_simulation
 int error(char *error_msg);
 int	args_parse(char **av);
 void    init_info_simulation(t_info_simulation *info_simulation, char **av);
-//void get_init_info(char **av, t_node *info_list);
+t_node	*init_list_of_coders(int number_of_coders, t_info_simulation infos);
