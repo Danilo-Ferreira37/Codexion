@@ -4,17 +4,17 @@
 #include <string.h>
 #include <unistd.h>
 
-typedef struct s_node
-{
-	void	*data;
-	struct s_node	*next;
-}				   t_node;
+//typedef struct s_node
+//{
+//	void	*data;
+//	struct s_node	*next;
+//}				   t_node;
 
 typedef struct s_dongle
 {
 	int dongle_id;
 	int cooldwn;
-	t_node	*waiting_queue;
+	//t_node	*waiting_queue;
 }	t_dongle;
 
 typedef struct s_coder
@@ -48,4 +48,5 @@ typedef struct s_info_simulation
 int error(char *error_msg);
 int	args_parse(char **av);
 void    init_info_simulation(t_info_simulation *info_simulation, char **av);
-t_node	*init_list_of_coders(int number_of_coders, t_info_simulation infos);
+t_coder	*init_list_of_coders(t_info_simulation infos);
+void	*clear_allocation(t_coder	*coders);

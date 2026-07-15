@@ -2,8 +2,26 @@
 
 int error(char *error_msg)
 {
+	if (!error_msg)
+		return (-1);
     fprintf(stderr, "Error: %s\n", error_msg);
 	return (-1);
+}
+
+void	*clear_allocation(t_coder	*coders)
+{
+	t_coder *tmp;
+
+	if (!coders)
+		return NULL;
+	
+	while(coders)
+	{
+		tmp = coders;
+		coders = coders->right_coder;
+		free(tmp);
+	}
+	return (NULL);
 }
 
 static int error_in_num(char *arg)
