@@ -14,7 +14,6 @@ int main(int ac, char **av)
     list_of_coders = init_list_of_coders(info_simulation);
     if (!list_of_coders)
         return (error("Memory allocation failure!"));
-    
 
     return (0);
 }

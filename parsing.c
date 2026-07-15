@@ -14,7 +14,8 @@ void	*clear_allocation(t_coder	*coders)
 
 	if (!coders)
 		return NULL;
-	
+	if (coders->left_coder)
+		coders->left_coder->right_coder = NULL;
 	while(coders)
 	{
 		tmp = coders;
