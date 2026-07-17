@@ -8,19 +8,28 @@ int error(char *error_msg)
 	return (-1);
 }
 
-void	*clear_allocation(t_coder	*coders)
+void	*clear_allocation(t_coder	*coders, t_dongle	**dongles)
 {
 	t_coder *tmp;
+	int i;
 
-	if (!coders)
-		return NULL;
-	if (coders->left_coder)
-		coders->left_coder->right_coder = NULL;
-	while(coders)
+	if (coders)
 	{
-		tmp = coders;
-		coders = coders->right_coder;
-		free(tmp);
+		if (coders->left_coder)
+			coders->left_coder->right_coder = NULL;
+		while(coders)
+		{
+			tmp = coders;
+			coders = coders->right_coder;
+			free(tmp);
+		}
+	}
+	if (dongles)
+	{
+		i = 0;
+		while(dongles[i])
+			free(dongles[i++]);
+		free(dongles);
 	}
 	return (NULL);
 }
