@@ -23,12 +23,12 @@ static	t_coder *create_coder(t_info_simulation infos, int coder_id)
 	memset(coder, 0, sizeof(t_coder));
 	coder->code_id = coder_id;
 	coder->time_to_die = infos.time_to_burnout;
-	if (coder_id == infos.number_of_coders - 1)
+	if (coder_id == infos.number_of_coders)
 		coder->right_dongle = infos.dongles[0];
 	else
-		coder->right_dongle = infos.dongles[coder->code_id + 1];
+		coder->right_dongle = infos.dongles[coder->code_id];
 
-	coder->left_dongle = infos.dongles[coder->code_id];
+	coder->left_dongle = infos.dongles[coder->code_id - 1];
 	return (coder);
 }
 
@@ -55,11 +55,11 @@ t_coder	*init_list_of_coders(t_info_simulation info)
 	int verify_error;
 	int i;
 
-	i = 0;
+	i = 1;
 	list_of_coder = create_coder(info, i++);
 	if (!list_of_coder)
 		return (clear_allocation(NULL, info.dongles));
-	while (i < info.number_of_coders)
+	while (i <= info.number_of_coders)
 	{
 		verify_error = lst_append_new_coders(list_of_coder, info, i++);
 		if (verify_error)

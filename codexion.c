@@ -18,6 +18,12 @@ int main(int ac, char **av)
         fifo(list_of_coders, info_simulation);
     else
         edf(list_of_coders, info_simulation); */
-
+    int i = 0;
+    while (i < info_simulation.number_of_coders)
+    {
+        printf("left dongle: %d, coder: %d, right dongle: %d\n", list_of_coders->left_dongle->dongle_id, list_of_coders->code_id, list_of_coders->right_dongle->dongle_id);
+        list_of_coders = list_of_coders->right_coder;
+        i++;
+    }
     return (0);
 }
