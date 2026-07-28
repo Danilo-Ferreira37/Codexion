@@ -1,20 +1,15 @@
+#include <time.h>
 #include <stdio.h>
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-//typedef struct s_node
-//{
-//	void	*data;
-//	struct s_node	*next;
-//}				   t_node;
-
 typedef struct s_dongle
 {
 	int dongle_id;
 	int cooldwn;
-	//t_node	*waiting_queue;
+	pthread_mutex_t lock;
 }	t_dongle;
 
 typedef struct s_coder
@@ -28,6 +23,8 @@ typedef struct s_coder
 	int time_without_copile;
 	int total_copiles;
 	int	time_to_die;
+	int has_l_dongle;
+	int has_r_dongle;
 	pthread_t thread;
 }	t_coder;
 
@@ -40,6 +37,7 @@ typedef struct s_info_simulation
     int	time_to_refactor;
 	int number_of_compiles_required;
 	int dongle_cooldown;
+	int start_ms;
 
 	char scheduler;
 	t_dongle	**dongles;
@@ -54,3 +52,6 @@ void	*clear_allocation(t_coder	*coders, t_dongle	**dongles);
 
 void fifo(t_coder *list_of_coders, t_info_simulation info);
 void edf(t_coder *list_of_coders, t_info_simulation info);
+
+void time_wait(int time_ms);
+void compile(t_coder *coder, t_info_simulation infos);

@@ -8,8 +8,11 @@ static t_dongle *create_dondler(t_info_simulation	*info_simulation, int dongle_i
 	if (!dongle)
 		return (NULL);
 	memset(dongle, 0, sizeof(t_dongle));
+
+	pthread_mutex_init(&dongle->lock, NULL);
 	dongle->cooldwn = info_simulation->dongle_cooldown;
 	dongle->dongle_id = dongle_id;
+	pthread_cond_init(dongle, NULL);
 	return (dongle);
 }
 
@@ -76,6 +79,7 @@ t_coder	*init_list_of_coders(t_info_simulation info)
 void *init_info_simulation(t_info_simulation	*info_simulation, char	**av)
 {
 	int i;
+	struct timespec time;
 
     info_simulation->number_of_coders = atoi(av[1]);
     info_simulation->time_to_burnout = atoi(av[2]);
@@ -88,7 +92,8 @@ void *init_info_simulation(t_info_simulation	*info_simulation, char	**av)
         info_simulation->scheduler = 'F';
     else
 		info_simulation->scheduler = 'E';
-
+	clock_gettime(CLOCK_MONOTONIC, &time);
+	info_simulation->start_ms = ((time.tv_sec * 1000) + (time.tv_nsec / 1000000));
 	info_simulation->dongles = malloc(info_simulation->number_of_coders * sizeof(t_dongle *));
 	if (!info_simulation->dongles)
 		return (NULL);
