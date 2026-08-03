@@ -106,3 +106,8 @@ void *init_info_simulation(t_info_simulation	*info_simulation, char	**av)
 	}
 	return ("Everything OK!");
 }
+
+void create_threads(t_info_simulation infos, t_coder coder)
+{
+
+}

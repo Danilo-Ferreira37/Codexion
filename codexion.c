@@ -3,7 +3,6 @@
 int main(int ac, char **av)
 {
     t_info_simulation info_simulation;
-    t_coder  *list_of_coders;
 
     if (ac != 9)
         return (error("Invalid number of arguments!"));
@@ -11,12 +10,9 @@ int main(int ac, char **av)
         return (-1);
     if (!init_info_simulation(&info_simulation, av))
         return (error("Memory allocation failure!"));
-    list_of_coders = init_list_of_coders(info_simulation);
-    if (!list_of_coders)
+    info_simulation.list_of_coders = init_list_of_coders(info_simulation);
+    if (!info_simulation.list_of_coders)
         return (error("Memory allocation failure!"));
-/*     if (info_simulation.scheduler == 'F')
-        fifo(list_of_coders, info_simulation);
-    else
-        edf(list_of_coders, info_simulation); */
-    compile(list_of_coders, info_simulation);
+
+    compile(info_simulation.list_of_coders);
 }

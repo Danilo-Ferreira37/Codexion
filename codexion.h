@@ -40,6 +40,7 @@ typedef struct s_info_simulation
 	int start_ms;
 
 	char scheduler;
+    t_coder  *list_of_coders;
 	t_dongle	**dongles;
 
 }   t_info_simulation;
