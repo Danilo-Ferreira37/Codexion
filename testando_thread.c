@@ -47,4 +47,11 @@ void compile(t_coder *coder, t_info_simulation infos)
         list_of_coders = list_of_coders->right_coder;
         i++;
     } */
-//estudar mais sobre phtread_join()
+/*     while(self)
+    {
+        printf("left dongle %d\n coder %d\nright dongle %d\n", self->left_dongle->dongle_id, self->code_id, self->right_dongle->dongle_id);
+        self = self->right_coder;
+        printf("\n");
+    }
+    exit(0);
+ */

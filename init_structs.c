@@ -8,11 +8,9 @@ static t_dongle *create_dondler(t_info_simulation	*info_simulation, int dongle_i
 	if (!dongle)
 		return (NULL);
 	memset(dongle, 0, sizeof(t_dongle));
-
 	pthread_mutex_init(&dongle->lock, NULL);
-	dongle->cooldwn = info_simulation->dongle_cooldown;
+	pthread_cond_init(&dongle->cond, NULL);
 	dongle->dongle_id = dongle_id;
-	pthread_cond_init(dongle, NULL);
 	return (dongle);
 }
 
@@ -71,8 +69,9 @@ t_coder	*init_list_of_coders(t_info_simulation info)
 	tmp = list_of_coder;
 	while (tmp->right_coder)
 		tmp = tmp->right_coder;
-	tmp->right_coder = list_of_coder;
-	list_of_coder->left_coder = tmp;
+	//circular list:
+	//tmp->right_coder = list_of_coder;
+	//list_of_coder->left_coder = tmp;
 	return (list_of_coder);
 }
 
@@ -93,6 +92,7 @@ void *init_info_simulation(t_info_simulation	*info_simulation, char	**av)
     else
 		info_simulation->scheduler = 'E';
 	clock_gettime(CLOCK_MONOTONIC, &time);
+	info_simulation->running = 1;
 	info_simulation->start_ms = ((time.tv_sec * 1000) + (time.tv_nsec / 1000000));
 	info_simulation->dongles = malloc(info_simulation->number_of_coders * sizeof(t_dongle *));
 	if (!info_simulation->dongles)
@@ -107,7 +107,17 @@ void *init_info_simulation(t_info_simulation	*info_simulation, char	**av)
 	return ("Everything OK!");
 }
 
-void create_threads(t_info_simulation infos, t_coder coder)
+void create_threads(t_info_simulation *infos)
 {
+    t_coder *tmp = infos->list_of_coders;
 
+    while (tmp)
+    {
+        t_thread_args *args = malloc(sizeof(t_thread_args));
+        args->coder = tmp;
+        args->infos = infos;
+
+        pthread_create(&tmp->thread, NULL, thread_algoritm, args);
+        tmp = tmp->right_coder;
+	}
 }

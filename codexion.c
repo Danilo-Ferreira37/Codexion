@@ -13,6 +13,7 @@ int main(int ac, char **av)
     info_simulation.list_of_coders = init_list_of_coders(info_simulation);
     if (!info_simulation.list_of_coders)
         return (error("Memory allocation failure!"));
-
-    compile(info_simulation.list_of_coders);
+    create_threads(&info_simulation);
+    join_threads(&info_simulation);
+    return (0);
 }
