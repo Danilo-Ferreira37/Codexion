@@ -73,7 +73,7 @@ void    join_threads(t_info_simulation *info);
 //TIME
 void time_wait(int time_ms);
 struct timespec get_cooldwn(t_info_simulation infos);
-int current_milliseconds(t_info_simulation infos);
+int current_milliseconds(t_info_simulation *infos);
 
 //TRASH
 void compile(t_coder *coder, t_info_simulation infos);

@@ -109,15 +109,15 @@ void *init_info_simulation(t_info_simulation	*info_simulation, char	**av)
 
 void create_threads(t_info_simulation *infos)
 {
-    t_coder *tmp = infos->list_of_coders;
+    t_coder *thread = infos->list_of_coders;
 
-    while (tmp)
+    while (thread)
     {
         t_thread_args *args = malloc(sizeof(t_thread_args));
-        args->coder = tmp;
+        args->coder = thread;
         args->infos = infos;
 
-        pthread_create(&tmp->thread, NULL, thread_algoritm, args);
-        tmp = tmp->right_coder;
+        pthread_create(&thread->thread, NULL, thread_algoritm, args);
+        thread = thread->right_coder;
 	}
 }

@@ -29,7 +29,7 @@ static int popleft_queue(int *queue)
     if (queue[1])
     {
         queue[0] = queue[1];
-        queue[1] = 0;;
+        queue[1] = 0;
     }
     else
         queue[0] = 0;
@@ -46,22 +46,29 @@ void *thread_algoritm(void *args)
     thread_args = (t_thread_args *)args;
     self = thread_args->coder;
     info = thread_args->infos;
+    int i = 0;
     free(args);
     if (self->code_id % 2 == 0)
         time_wait(2000);
     while (info->running)
     {
+        if (i++ == 10)
+            exit(0);
         pthread_mutex_lock(&self->left_dongle->lock);
+        //printf("goo\n");
         if (!self->left_dongle->owner && !self->left_dongle->waiting_queue[0])
         {
             self->left_dongle->owner = self->code_id;
             self->has_left_dongle = 1;
+            printf("%d %d has taken a dongle\n", current_milliseconds(info), self->code_id);
         }
+        else if (self->left_dongle->owner == self->code_id);
         else
         {
             if (self->left_dongle->waiting_queue[0] == self->code_id && !self->left_dongle->owner)
             {
                 self->left_dongle->owner = popleft_queue(self->left_dongle->waiting_queue);
+                printf("%d %d has taken a dongle\n", current_milliseconds(info), self->code_id);
                 self->has_left_dongle = 1;
             }
             else
@@ -71,17 +78,21 @@ void *thread_algoritm(void *args)
             }
         }
         pthread_mutex_unlock(&self->left_dongle->lock);
-        //_____________________________________________________________________________________________________________________________________________________________
+//________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+//________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
         pthread_mutex_lock(&self->right_dongle->lock);
         if (!self->right_dongle->owner && !self->right_dongle->waiting_queue[0])
         {
             self->right_dongle->owner = self->code_id;
             self->has_right_dongle = 1;
+            printf("%d %d has taken a dongle\n", current_milliseconds(info), self->code_id);
         }
+        else if (self->right_dongle->owner == self->code_id);
         else
         {
             if (self->right_dongle->waiting_queue[0] == self->code_id && !self->right_dongle->owner)
             {
+                printf("%d %d has taken a dongle\n", current_milliseconds(info), self->code_id);
                 self->right_dongle->owner = popleft_queue(self->right_dongle->waiting_queue);
                 self->has_right_dongle = 1;
             }
@@ -92,6 +103,21 @@ void *thread_algoritm(void *args)
             }
         }
         pthread_mutex_unlock(&self->right_dongle->lock);
-        
+
+        if (self->has_left_dongle && self->has_right_dongle)
+        {
+            printf("%d %d is copiling\n",  current_milliseconds(info), self->code_id);
+            pthread_mutex_lock(&self->right_dongle->lock);
+            self->right_dongle->owner = 0;
+            pthread_mutex_unlock(&self->right_dongle->lock);
+
+            pthread_mutex_lock(&self->left_dongle->lock);
+            self->left_dongle->owner = 0;
+            pthread_mutex_unlock(&self->left_dongle->lock);
+            self->has_left_dongle = 0;
+            self->has_right_dongle = 0;
+
+        }
+    }
         return (NULL);
 }
