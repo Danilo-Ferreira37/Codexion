@@ -112,10 +112,29 @@ void *init_info_simulation(t_info_simulation	*info_simulation, char	**av)
 	return ("Everything OK!");
 }
 
+void *supervision(void *information)
+{
+    t_info_simulation *info;
+    t_coder *coder;
+
+    info = (t_info_simulation *) information;
+    coder = info->list_of_coders;
+    while (coder->code_id < info->number_of_coders)
+    {
+        if (coder->died)
+            info->running = 0;
+        coder = coder->right_coder;
+    }
+    return (NULL);
+}
+
 void create_threads(t_info_simulation *infos)
 {
     t_coder *thread = infos->list_of_coders;
+    t_supervisor *supervisor;
 
+    supervisor = malloc(sizeof(t_supervisor));
+    pthread_create(&supervisor->thread, NULL, supervision, infos);
     while (thread)
     {
         t_thread_args *args = malloc(sizeof(t_thread_args));

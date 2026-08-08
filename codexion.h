@@ -31,6 +31,7 @@ typedef struct s_coder
 
 	int time_without_copile;
 	int total_compiles;
+    int died;
 	pthread_t thread;
 }	t_coder;
 
@@ -53,10 +54,17 @@ typedef struct s_info_simulation
 
 }   t_info_simulation;
 
+typedef struct s_supervisor
+{
+    t_info_simulation *info;
+    pthread_t thread;
+}   t_supervisor;
+
+
 typedef struct s_thread_args {
     t_coder *coder;
     t_info_simulation *infos;
-} t_thread_args;
+}   t_thread_args;
 
 //PARSER AND CLEAR ALLOC
 int error(char *error_msg);
