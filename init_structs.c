@@ -23,7 +23,6 @@ static	t_coder *create_coder(t_info_simulation infos, int coder_id)
 		return (NULL);
 	memset(coder, 0, sizeof(t_coder));
 	coder->code_id = coder_id;
-	coder->time_to_die = infos.time_to_burnout;
 	if (coder_id == infos.number_of_coders)
 		coder->right_dongle = infos.dongles[0];
 	else

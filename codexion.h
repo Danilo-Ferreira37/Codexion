@@ -31,9 +31,6 @@ typedef struct s_coder
 
 	int time_without_copile;
 	int total_compiles;
-	int	time_to_die;
-	int has_left_dongle;
-	int has_right_dongle;
 	pthread_t thread;
 }	t_coder;
 

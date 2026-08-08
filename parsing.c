@@ -61,7 +61,7 @@ int args_parse(char **av)
     {
 		if (error_in_num(av[i]))
 			return (-1);
-		if (atoi(av[i]) <= 0)
+		if (atoi(av[i]) < 0)
 			return(error("The numerical arguments must be positive integers!"));
 		i++;
     }
