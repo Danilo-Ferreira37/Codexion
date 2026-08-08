@@ -82,7 +82,7 @@ void *init_info_simulation(t_info_simulation	*info_simulation, char	**av)
 
     info_simulation->number_of_coders = atoi(av[1]);
     info_simulation->time_to_burnout = atoi(av[2]);
-    info_simulation->time_to_copile = atoi(av[3]);
+    info_simulation->time_to_compile = atoi(av[3]);
     info_simulation->time_to_debug = atoi(av[4]);
     info_simulation->time_to_refactor = atoi(av[5]);
     info_simulation->number_of_compiles_required = atoi(av[6]);
@@ -92,8 +92,9 @@ void *init_info_simulation(t_info_simulation	*info_simulation, char	**av)
     else
 		info_simulation->scheduler = 'E';
 	clock_gettime(CLOCK_MONOTONIC, &time);
-	info_simulation->running = 1;
 	info_simulation->start_ms = ((time.tv_sec * 1000) + (time.tv_nsec / 1000000));
+		
+	info_simulation->running = 1;
 	info_simulation->dongles = malloc(info_simulation->number_of_coders * sizeof(t_dongle *));
 	if (!info_simulation->dongles)
 		return (NULL);
@@ -104,6 +105,11 @@ void *init_info_simulation(t_info_simulation	*info_simulation, char	**av)
 		if (!info_simulation->dongles[i++])
 			return (clear_allocation(NULL, info_simulation->dongles));
 	}
+    info_simulation->printl = malloc(sizeof(t_print_locked));
+    memset(info_simulation->printl, 0, sizeof(t_print_locked));
+    
+    pthread_mutex_init(&info_simulation->printl->lock, NULL);
+    info_simulation->printl->print = printf;
 	return ("Everything OK!");
 }
 

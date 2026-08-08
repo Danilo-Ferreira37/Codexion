@@ -12,6 +12,7 @@ int current_milliseconds(t_info_simulation *infos)
 
     clock_gettime(CLOCK_MONOTONIC, &time);
     current_ms = ((time.tv_sec * 1000) + (time.tv_nsec / 1000000));
+    //printf("\ntempo do comeco %d   tempo atual %d\n", infos->start_ms, current_ms);
     return (current_ms - infos->start_ms);
 }
 

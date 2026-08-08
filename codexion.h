@@ -5,12 +5,17 @@
 #include <string.h>
 #include <unistd.h>
 
+typedef struct s_print_locked {
+    int (*print)(const char *, ...);
+    pthread_mutex_t lock;
+} t_print_locked;
+
 typedef struct s_dongle
 {
 	int dongle_id;
-	int cooldown;
 	int waiting_queue[2];
 	int owner;
+	int released_ms;
 	pthread_mutex_t lock;
 	pthread_cond_t  cond;
 
@@ -25,7 +30,7 @@ typedef struct s_coder
 	struct s_coder *right_coder;
 
 	int time_without_copile;
-	int total_copiles;
+	int total_compiles;
 	int	time_to_die;
 	int has_left_dongle;
 	int has_right_dongle;
@@ -36,16 +41,16 @@ typedef struct s_info_simulation
 {
     int	number_of_coders;
     int	time_to_burnout;
-    int	time_to_copile;
+    int	time_to_compile;
     int	time_to_debug;
     int	time_to_refactor;
 	int number_of_compiles_required;
 	int dongle_cooldown;
-	int start_ms;
-
-
 	char scheduler;
+	
+	int start_ms;
 	int running;
+	t_print_locked *printl;
     t_coder  *list_of_coders;
 	t_dongle	**dongles;
 
@@ -55,7 +60,7 @@ typedef struct s_thread_args {
     t_coder *coder;
     t_info_simulation *infos;
 } t_thread_args;
- 
+
 //PARSER AND CLEAR ALLOC
 int error(char *error_msg);
 int	args_parse(char **av);
@@ -76,4 +81,4 @@ struct timespec get_cooldwn(t_info_simulation infos);
 int current_milliseconds(t_info_simulation *infos);
 
 //TRASH
-void compile(t_coder *coder, t_info_simulation infos);
+//void compile(t_coder *coder, t_info_simulation infos);
