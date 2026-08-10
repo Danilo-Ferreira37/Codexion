@@ -26,7 +26,6 @@ typedef struct s_coder
 	int code_id;
 	t_dongle *left_dongle;
 	t_dongle *right_dongle;
-	struct s_coder *left_coder;
 	struct s_coder *right_coder;
 
 	int time_without_copile;
@@ -60,7 +59,6 @@ typedef struct s_supervisor
     pthread_t thread;
 }   t_supervisor;
 
-
 typedef struct s_thread_args {
     t_coder *coder;
     t_info_simulation *infos;
@@ -69,21 +67,29 @@ typedef struct s_thread_args {
 //PARSER AND CLEAR ALLOC
 int error(char *error_msg);
 int	args_parse(char **av);
-void	*clear_allocation(t_coder	*coders, t_dongle	**dongles);
+void	*clear_allocation(t_info_simulation *infos);
 
 //INITS
 void *init_info_simulation(t_info_simulation	*info_simulation, char	**av);
 t_coder	*init_list_of_coders(t_info_simulation infos);
 void create_threads(t_info_simulation *infos);
 
-//ROUTINE
+//ACTIONS
+int try_compile(t_coder *self, t_info_simulation *info);
+void try_get_dongle(int coder_id, t_dongle *dongle, t_info_simulation *info);
+void debug(t_coder *self, t_info_simulation *info);
+void refactor(t_coder *self, t_info_simulation *info);
+
+//LIST MANIPULATION
+void append_queue(int *queue, int coder_id);
+int popleft_queue(int *queue);
+
+//THREADS ROUTINES
 void* thread_algoritm(void *infos);
+void *supervision(void *information);
 void    join_threads(t_info_simulation *info);
 
 //TIME
 void time_wait(int time_ms);
 struct timespec get_cooldwn(t_info_simulation infos);
 int current_milliseconds(t_info_simulation *infos);
-
-//TRASH
-//void compile(t_coder *coder, t_info_simulation infos);

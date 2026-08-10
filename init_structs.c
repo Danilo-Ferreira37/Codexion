@@ -38,13 +38,13 @@ static int lst_append_new_coders(t_coder *coder, t_info_simulation infos, int id
 	t_coder *tmp;
 
 	tmp = coder;
+
 	while(tmp->right_coder)
 		tmp = tmp->right_coder;
 	next_coder = create_coder(infos, id_coder);
 	if (!next_coder)
 		return (error(NULL));
 	tmp->right_coder = next_coder;
-	next_coder->left_coder = tmp;
 	return (0);
 }
 
@@ -58,90 +58,55 @@ t_coder	*init_list_of_coders(t_info_simulation info)
 	i = 1;
 	list_of_coder = create_coder(info, i++);
 	if (!list_of_coder)
-		return (clear_allocation(NULL, info.dongles));
+		return (clear_allocation(&info));
 	while (i <= info.number_of_coders)
 	{
 		verify_error = lst_append_new_coders(list_of_coder, info, i++);
 		if (verify_error)
-			return (clear_allocation(list_of_coder, info.dongles));
+			return (clear_allocation(&info));
 	}
 	tmp = list_of_coder;
-	while (tmp->right_coder)
+	while (tmp->code_id < info.number_of_coders)
 		tmp = tmp->right_coder;
 	//circular list:
-	//tmp->right_coder = list_of_coder;
-	//list_of_coder->left_coder = tmp;
+	tmp->right_coder = list_of_coder;
 	return (list_of_coder);
 }
 
-void *init_info_simulation(t_info_simulation	*info_simulation, char	**av)
+void *init_info_simulation(t_info_simulation	*infos, char	**av)
 {
 	int i;
 	struct timespec time;
 
-    info_simulation->number_of_coders = atoi(av[1]);
-    info_simulation->time_to_burnout = atoi(av[2]);
-    info_simulation->time_to_compile = atoi(av[3]);
-    info_simulation->time_to_debug = atoi(av[4]);
-    info_simulation->time_to_refactor = atoi(av[5]);
-    info_simulation->number_of_compiles_required = atoi(av[6]);
-    info_simulation->dongle_cooldown = atoi(av[7]);
+    infos->number_of_coders = atoi(av[1]);
+    infos->time_to_burnout = atoi(av[2]);
+    infos->time_to_compile = atoi(av[3]);
+    infos->time_to_debug = atoi(av[4]);
+    infos->time_to_refactor = atoi(av[5]);
+    infos->number_of_compiles_required = atoi(av[6]);
+    infos->dongle_cooldown = atoi(av[7]);
     if (strcmp(av[8], "fifo") == 0)
-        info_simulation->scheduler = 'F';
+        infos->scheduler = 'F';
     else
-		info_simulation->scheduler = 'E';
+		infos->scheduler = 'E';
 	clock_gettime(CLOCK_MONOTONIC, &time);
-	info_simulation->start_ms = ((time.tv_sec * 1000) + (time.tv_nsec / 1000000));
+	infos->start_ms = ((time.tv_sec * 1000) + (time.tv_nsec / 1000000));
 		
-	info_simulation->running = 1;
-	info_simulation->dongles = malloc(info_simulation->number_of_coders * sizeof(t_dongle *));
-	if (!info_simulation->dongles)
+	infos->running = 1;
+	infos->dongles = malloc(infos->number_of_coders * sizeof(t_dongle *));
+	if (!infos->dongles)
 		return (NULL);
 	i = 0;
-	while(i < info_simulation->number_of_coders)
+	while(i < infos->number_of_coders)
 	{
-		info_simulation->dongles[i] = create_dondler(info_simulation, i);
-		if (!info_simulation->dongles[i++])
-			return (clear_allocation(NULL, info_simulation->dongles));
+		infos->dongles[i] = create_dondler(infos, i);
+		if (!infos->dongles[i++])
+			return (clear_allocation(infos));
 	}
-    info_simulation->printl = malloc(sizeof(t_print_locked));
-    memset(info_simulation->printl, 0, sizeof(t_print_locked));
+    infos->printl = malloc(sizeof(t_print_locked));
+    memset(infos->printl, 0, sizeof(t_print_locked));
     
-    pthread_mutex_init(&info_simulation->printl->lock, NULL);
-    info_simulation->printl->print = printf;
+    pthread_mutex_init(&infos->printl->lock, NULL);
+    infos->printl->print = printf;
 	return ("Everything OK!");
-}
-
-void *supervision(void *information)
-{
-    t_info_simulation *info;
-    t_coder *coder;
-
-    info = (t_info_simulation *) information;
-    coder = info->list_of_coders;
-    while (coder->code_id < info->number_of_coders)
-    {
-        if (coder->died)
-            info->running = 0;
-        coder = coder->right_coder;
-    }
-    return (NULL);
-}
-
-void create_threads(t_info_simulation *infos)
-{
-    t_coder *thread = infos->list_of_coders;
-    t_supervisor *supervisor;
-
-    supervisor = malloc(sizeof(t_supervisor));
-    pthread_create(&supervisor->thread, NULL, supervision, infos);
-    while (thread)
-    {
-        t_thread_args *args = malloc(sizeof(t_thread_args));
-        args->coder = thread;
-        args->infos = infos;
-
-        pthread_create(&thread->thread, NULL, thread_algoritm, args);
-        thread = thread->right_coder;
-	}
 }
