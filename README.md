@@ -8,3 +8,7 @@ https://dev.to/pliniohr/threads-na-linguagem-c-598k
         info_simulation.list_of_coders = info_simulation.list_of_coders->right_coder;
     }
     exit(0);
+
+➜  Codexion git:(main) ✗ ccf -pthread *.c
+
+➜  Codexion git:(main) ✗ valgrind --tool=helgrind --track-lockorders=yes ./a.out 8 8000 1000 500 500 1 3

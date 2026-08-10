@@ -27,12 +27,14 @@ static int compile(t_coder *self, t_info_simulation *info)
         self->left_dongle->released_ms = current_milliseconds(info);
         pthread_cond_broadcast(&self->left_dongle->cond);
         pthread_mutex_unlock(&self->left_dongle->lock);
+
         return (1);
 }
 
 void try_get_dongle(int coder_id, t_dongle *dongle, t_info_simulation *info)
 {
-    if (dongle->owner == coder_id);
+    if (dongle->owner == coder_id)
+        return;
     else if (!dongle->owner && !dongle->waiting_queue[0] && (current_milliseconds(info) > dongle->released_ms + info->dongle_cooldown || !dongle->released_ms))
         get_dongle(coder_id, dongle, info);
     else

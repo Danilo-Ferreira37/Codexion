@@ -4,6 +4,7 @@ void    join_threads(t_info_simulation *info)
 {
     t_coder *tmp;
 
+    pthread_join(info->supervisor->thread, NULL);
     tmp = info->list_of_coders;
     while (1)
     {
@@ -17,11 +18,9 @@ void    join_threads(t_info_simulation *info)
 void create_threads(t_info_simulation *infos)
 {
     t_coder *thread;
-    t_supervisor *supervisor;
 
-    supervisor = malloc(sizeof(t_supervisor));
+    pthread_create(&infos->supervisor->thread, NULL, supervision, infos);
 	thread = infos->list_of_coders;
-    pthread_create(&supervisor->thread, NULL, supervision, infos);
     while (1)
     {
         t_thread_args *args = malloc(sizeof(t_thread_args));
@@ -42,9 +41,10 @@ void *supervision(void *information)
 
     info = (t_info_simulation *) information;
     coder = info->list_of_coders;
-    while (coder->code_id < info->number_of_coders)
+    while (info->running)
     {
-        if (coder->died)
+        //pthread_mutex_lock(&info)
+        if (coder->died || info->qnty_coders_comp == info->number_of_coders)
             info->running = 0;
         coder = coder->right_coder;
     }
@@ -71,5 +71,8 @@ void *thread_algoritm(void *args)
             refactor(self, info);
         }
     }
-        return (NULL);
+    pthread_mutex_lock(&info->lock);
+    info->qnty_coders_comp++;
+    pthread_mutex_unlock(&info->lock);
+    return (NULL);
 }

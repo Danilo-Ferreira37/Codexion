@@ -5,6 +5,8 @@
 #include <string.h>
 #include <unistd.h>
 
+typedef struct s_info_simulation t_info_simulation;
+
 typedef struct s_print_locked {
     int (*print)(const char *, ...);
     pthread_mutex_t lock;
@@ -34,6 +36,12 @@ typedef struct s_coder
 	pthread_t thread;
 }	t_coder;
 
+typedef struct s_supervisor
+{
+    t_info_simulation *info;
+    pthread_t thread;
+}   t_supervisor;
+
 typedef struct s_info_simulation
 {
     int	number_of_coders;
@@ -46,18 +54,16 @@ typedef struct s_info_simulation
 	char scheduler;
 	
 	int start_ms;
+	int qnty_coders_comp;
 	int running;
+
+	pthread_mutex_t lock;
+	t_supervisor *supervisor;
 	t_print_locked *printl;
     t_coder  *list_of_coders;
 	t_dongle	**dongles;
 
 }   t_info_simulation;
-
-typedef struct s_supervisor
-{
-    t_info_simulation *info;
-    pthread_t thread;
-}   t_supervisor;
 
 typedef struct s_thread_args {
     t_coder *coder;

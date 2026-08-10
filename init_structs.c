@@ -2,6 +2,7 @@
 
 static t_dongle *create_dondler(t_info_simulation	*info_simulation, int dongle_id)
 {
+	(void) info_simulation;
 	t_dongle *dongle;
 
 	dongle = malloc(sizeof(t_dongle));
@@ -89,10 +90,12 @@ void *init_info_simulation(t_info_simulation	*infos, char	**av)
         infos->scheduler = 'F';
     else
 		infos->scheduler = 'E';
+	infos->running = 1;
+
 	clock_gettime(CLOCK_MONOTONIC, &time);
 	infos->start_ms = ((time.tv_sec * 1000) + (time.tv_nsec / 1000000));
 		
-	infos->running = 1;
+
 	infos->dongles = malloc(infos->number_of_coders * sizeof(t_dongle *));
 	if (!infos->dongles)
 		return (NULL);
@@ -103,10 +106,15 @@ void *init_info_simulation(t_info_simulation	*infos, char	**av)
 		if (!infos->dongles[i++])
 			return (clear_allocation(infos));
 	}
+
+    infos->supervisor = malloc(sizeof(t_supervisor));
+	infos->supervisor->info = infos;
+	pthread_mutex_init(&infos->lock, NULL);
+
     infos->printl = malloc(sizeof(t_print_locked));
     memset(infos->printl, 0, sizeof(t_print_locked));
-    
     pthread_mutex_init(&infos->printl->lock, NULL);
     infos->printl->print = printf;
+
 	return ("Everything OK!");
 }
