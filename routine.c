@@ -47,6 +47,7 @@ void wakeup_all_threads(t_dongle **dongles)
         pthread_mutex_unlock(&dongles[i]->lock);
     }
 }
+
 void *supervision(void *information)
 {
     t_info_simulation *info;
