@@ -15,7 +15,7 @@ void	*clear_allocation(t_info_simulation *infos)
 
 	if (infos->list_of_coders)
 	{
-		while(infos->list_of_coders->code_id < infos->number_of_coders)
+		while(infos->list_of_coders->coder_id < infos->number_of_coders)
 		{
 			tmp = infos->list_of_coders;
 			infos->list_of_coders = infos->list_of_coders->right_coder;

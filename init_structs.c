@@ -1,8 +1,7 @@
 #include "codexion.h"
 
-static t_dongle *create_dondler(t_info_simulation	*info_simulation, int dongle_id)
+static t_dongle *create_dondler(int dongle_id)
 {
-	(void) info_simulation;
 	t_dongle *dongle;
 
 	dongle = malloc(sizeof(t_dongle));
@@ -23,13 +22,13 @@ static	t_coder *create_coder(t_info_simulation infos, int coder_id)
 	if (!coder)
 		return (NULL);
 	memset(coder, 0, sizeof(t_coder));
-	coder->code_id = coder_id;
+	coder->coder_id = coder_id;
 	if (coder_id == infos.number_of_coders)
 		coder->right_dongle = infos.dongles[0];
 	else
-		coder->right_dongle = infos.dongles[coder->code_id];
+		coder->right_dongle = infos.dongles[coder->coder_id];
 
-	coder->left_dongle = infos.dongles[coder->code_id - 1];
+	coder->left_dongle = infos.dongles[coder->coder_id - 1];
 	return (coder);
 }
 
@@ -67,7 +66,7 @@ t_coder	*init_list_of_coders(t_info_simulation info)
 			return (clear_allocation(&info));
 	}
 	tmp = list_of_coder;
-	while (tmp->code_id < info.number_of_coders)
+	while (tmp->coder_id < info.number_of_coders)
 		tmp = tmp->right_coder;
 	//circular list:
 	tmp->right_coder = list_of_coder;
@@ -102,7 +101,7 @@ void *init_info_simulation(t_info_simulation	*infos, char	**av)
 	i = 0;
 	while(i < infos->number_of_coders)
 	{
-		infos->dongles[i] = create_dondler(infos, i);
+		infos->dongles[i] = create_dondler(i);
 		if (!infos->dongles[i++])
 			return (clear_allocation(infos));
 	}

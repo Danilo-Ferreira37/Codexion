@@ -25,14 +25,13 @@ typedef struct s_dongle
 
 typedef struct s_coder
 {
-	int code_id;
+	int coder_id;
 	t_dongle *left_dongle;
 	t_dongle *right_dongle;
 	struct s_coder *right_coder;
 
-	int time_without_copile;
+	int last_compile;
 	int total_compiles;
-    int died;
 	pthread_t thread;
 }	t_coder;
 
@@ -54,6 +53,7 @@ typedef struct s_info_simulation
 	char scheduler;
 	
 	int start_ms;
+	int someone_dies;
 	int qnty_coders_comp;
 	int running;
 
@@ -82,20 +82,19 @@ void create_threads(t_info_simulation *infos);
 
 //ACTIONS
 int try_compile(t_coder *self, t_info_simulation *info);
-void try_get_dongle(int coder_id, t_dongle *dongle, t_info_simulation *info);
-void debug(t_coder *self, t_info_simulation *info);
-void refactor(t_coder *self, t_info_simulation *info);
+int debug_and_refactor(t_coder *self, t_info_simulation *info);
+void printl(char *message, t_info_simulation *info, int coder_id);
+int thread_dies(t_coder *self, t_info_simulation *info);
 
 //LIST MANIPULATION
 void append_queue(int *queue, int coder_id);
 int popleft_queue(int *queue);
 
 //THREADS ROUTINES
-void* thread_algoritm(void *infos);
+void *thread_algoritm(void *infos);
 void *supervision(void *information);
 void    join_threads(t_info_simulation *info);
 
 //TIME
 void time_wait(int time_ms);
-struct timespec get_cooldwn(t_info_simulation infos);
 int current_milliseconds(t_info_simulation *infos);

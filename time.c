@@ -16,18 +16,7 @@ int current_milliseconds(t_info_simulation *infos)
     return (current_ms - infos->start_ms);
 }
 
-struct timespec get_cooldwn(t_info_simulation infos)
+/* int get_time_until_burnout(t_info_simulation *info, t_coder *coder)
 {
-    struct timespec time;
 
-    clock_gettime(CLOCK_REALTIME, &time);
-    //printf("%ld, %ld", time.tv_sec, time.tv_nsec);
-    time.tv_sec += infos.dongle_cooldown / 1000;
-    time.tv_nsec += (infos.dongle_cooldown % 1000) * 1000000;
-    if (time.tv_nsec > 1000000000)
-    {
-        time.tv_sec += 1;
-        time.tv_nsec -= 1000000000;
-    }
-    return (time);
-}
+} */
