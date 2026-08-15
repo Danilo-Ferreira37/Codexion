@@ -78,6 +78,7 @@ void *init_info_simulation(t_info_simulation	*infos, char	**av)
 	int i;
 	struct timespec time;
 
+	memset(infos, 0, sizeof(t_info_simulation));
     infos->number_of_coders = atoi(av[1]);
     infos->time_to_burnout = atoi(av[2]);
     infos->time_to_compile = atoi(av[3]);
@@ -95,7 +96,7 @@ void *init_info_simulation(t_info_simulation	*infos, char	**av)
 	infos->start_ms = ((time.tv_sec * 1000) + (time.tv_nsec / 1000000));
 		
 
-	infos->dongles = malloc(infos->number_of_coders * sizeof(t_dongle *));
+	infos->dongles = malloc(infos->number_of_coders * sizeof(t_dongle *) + 1);
 	if (!infos->dongles)
 		return (NULL);
 	i = 0;
@@ -105,6 +106,7 @@ void *init_info_simulation(t_info_simulation	*infos, char	**av)
 		if (!infos->dongles[i++])
 			return (clear_allocation(infos));
 	}
+	infos->dongles[i] = NULL;
 
     infos->supervisor = malloc(sizeof(t_supervisor));
 	infos->supervisor->info = infos;

@@ -52,21 +52,24 @@ void *supervision(void *information)
 {
     t_info_simulation *info;
     t_coder *coder;
+    int burnout;
 
     info = (t_info_simulation *) information;
     coder = info->list_of_coders;
-    while (1)
+    while (coder)
     {
         pthread_mutex_lock(&info->lock);
-        if (info->someone_dies || info->qnty_coders_comp == info->number_of_coders)
+        burnout = current_milliseconds(info) - coder->last_compile >= info->time_to_burnout;
+        if (burnout || info->qnty_coders_comp == info->number_of_coders)
         {
             info->running = 0;
+            if (burnout)
+                printf("%d %d burned out\n", current_milliseconds(info), coder->coder_id);
             pthread_mutex_unlock(&info->lock);
             break;
         }
         pthread_mutex_unlock(&info->lock);
         coder = coder->right_coder;
-        time_wait(200);
     }
     wakeup_all_threads(info->dongles);
     return (NULL);
@@ -95,8 +98,7 @@ void *thread_algoritm(void *args)
                 break;
     }
     pthread_mutex_lock(&info->lock);
-    if (!info->someone_dies)
-        info->qnty_coders_comp++;
+    info->qnty_coders_comp++;
     pthread_mutex_unlock(&info->lock);
     return (NULL);
 }

@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 typedef struct s_info_simulation t_info_simulation;
+typedef struct s_coder t_coder;
 
 typedef struct s_print_locked {
     int (*print)(const char *, ...);
@@ -15,7 +16,7 @@ typedef struct s_print_locked {
 typedef struct s_dongle
 {
 	int dongle_id;
-	int waiting_queue[2];
+	t_coder *waiting_queue[2];
 	int owner;
 	int released_ms;
 	pthread_mutex_t lock;
@@ -31,6 +32,7 @@ typedef struct s_coder
 	struct s_coder *right_coder;
 
 	int last_compile;
+	int died;
 	int total_compiles;
 	pthread_t thread;
 }	t_coder;
@@ -41,19 +43,19 @@ typedef struct s_supervisor
     pthread_t thread;
 }   t_supervisor;
 
+// mudar pra long
 typedef struct s_info_simulation
 {
     int	number_of_coders;
-    int	time_to_burnout;
-    int	time_to_compile;
-    int	time_to_debug;
-    int	time_to_refactor;
+    long	time_to_burnout;
+    long	time_to_compile;
+    long	time_to_debug;
+    long	time_to_refactor;
 	int number_of_compiles_required;
-	int dongle_cooldown;
+	long dongle_cooldown;
 	char scheduler;
 	
-	int start_ms;
-	int someone_dies;
+	long start_ms;
 	int qnty_coders_comp;
 	int running;
 
@@ -84,11 +86,11 @@ void create_threads(t_info_simulation *infos);
 int try_compile(t_coder *self, t_info_simulation *info);
 int debug_and_refactor(t_coder *self, t_info_simulation *info);
 void printl(char *message, t_info_simulation *info, int coder_id);
-int thread_dies(t_coder *self, t_info_simulation *info);
+int stopped(t_info_simulation *info);
+t_coder    *scheduler(t_coder **waiting_queue, int remove_chosen_coder, t_info_simulation *infos);
 
 //LIST MANIPULATION
-void append_queue(int *queue, int coder_id);
-int popleft_queue(int *queue);
+void append_queue(t_coder **queue, t_coder *coder);
 
 //THREADS ROUTINES
 void *thread_algoritm(void *infos);
