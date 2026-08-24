@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 15:53:17 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/24 21:53:08 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/24 22:22:02 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ static void	view_scheduler(t_coder *self, t_dongle *dongle,
 			info);
 	else
 	{
+		// dongle_cooldown
 		append_queue(dongle->waiting_queue, self);
 		if (dongle->owner)
 			pthread_cond_wait(&dongle->cond, &dongle->lock);
