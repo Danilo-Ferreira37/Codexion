@@ -1,102 +1,127 @@
-#include <time.h>
-#include <stdio.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   codexion.h                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/24 21:03:32 by dosorio-          #+#    #+#             */
+/*   Updated: 2026/08/24 21:55:38 by dosorio-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <pthread.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 
-typedef struct s_info_simulation t_info_simulation;
-typedef struct s_coder t_coder;
+typedef struct s_info_simulation	t_info_simulation;
+typedef struct s_coder				t_coder;
 
-typedef struct s_print_locked {
-    int (*print)(const char *, ...);
-    pthread_mutex_t lock;
-} t_print_locked;
+typedef struct s_print_locked
+{
+	int								(*print)(const char *, ...);
+	pthread_mutex_t					lock;
+}									t_print_locked;
 
 typedef struct s_dongle
 {
-	int dongle_id;
-	t_coder *waiting_queue[2];
-	int owner;
-	int released_ms;
-	pthread_mutex_t lock;
-	pthread_cond_t  cond;
+	int								dongle_id;
+	t_coder							*waiting_queue[2];
+	int								owner;
+	int								released_ms;
+	pthread_mutex_t					lock;
+	pthread_cond_t					cond;
 
-}	t_dongle;
+}									t_dongle;
 
 typedef struct s_coder
 {
-	int coder_id;
-	t_dongle *left_dongle;
-	t_dongle *right_dongle;
-	struct s_coder *right_coder;
+	int								coder_id;
+	t_dongle						*left_dongle;
+	t_dongle						*right_dongle;
+	struct s_coder					*right_coder;
 
-	int last_compile;
-	int died;
-	int total_compiles;
-	pthread_t thread;
-}	t_coder;
+	int								last_compile;
+	int								died;
+	int								total_compiles;
+	pthread_t						thread;
+	pthread_mutex_t					thread_lock;
+}									t_coder;
 
 typedef struct s_supervisor
 {
-    t_info_simulation *info;
-    pthread_t thread;
-}   t_supervisor;
+	t_info_simulation				*info;
+	pthread_t						thread;
+}									t_supervisor;
 
 // mudar pra long
 typedef struct s_info_simulation
 {
-    int	number_of_coders;
-    long	time_to_burnout;
-    long	time_to_compile;
-    long	time_to_debug;
-    long	time_to_refactor;
-	int number_of_compiles_required;
-	long dongle_cooldown;
-	char scheduler;
-	
-	long start_ms;
-	int qnty_coders_comp;
-	int running;
+	int								number_of_coders;
+	long							time_to_burnout;
+	long							time_to_compile;
+	long							time_to_debug;
+	long							time_to_refactor;
+	int								number_of_compiles_required;
+	long							dongle_cooldown;
+	char							scheduler;
 
-	pthread_mutex_t lock;
-	t_supervisor *supervisor;
-	t_print_locked *printl;
-    t_coder  *list_of_coders;
-	t_dongle	**dongles;
+	long							start_ms;
+	int								qnty_coders_comp;
+	int								running;
 
-}   t_info_simulation;
+	pthread_mutex_t					lock;
+	t_supervisor					*supervisor;
+	t_print_locked					*printl;
+	t_coder							*list_of_coders;
+	t_dongle						**dongles;
 
-typedef struct s_thread_args {
-    t_coder *coder;
-    t_info_simulation *infos;
-}   t_thread_args;
+}									t_info_simulation;
 
-//PARSER AND CLEAR ALLOC
-int error(char *error_msg);
-int	args_parse(char **av);
-void	*clear_allocation(t_info_simulation *infos);
+typedef struct s_thread_args
+{
+	t_coder							*coder;
+	t_info_simulation				*infos;
+}									t_thread_args;
 
-//INITS
-void *init_info_simulation(t_info_simulation	*info_simulation, char	**av);
-t_coder	*init_list_of_coders(t_info_simulation infos);
-void create_threads(t_info_simulation *infos);
+// PARSER AND CLEAR ALLOC
+int			error(char *error_msg,
+				t_info_simulation *infos);
+int			args_parse(char **av);
+void		*clear_allocation(t_info_simulation *infos);
 
-//ACTIONS
-int try_compile(t_coder *self, t_info_simulation *info);
-int debug_and_refactor(t_coder *self, t_info_simulation *info);
-void printl(char *message, t_info_simulation *info, int coder_id);
-int stopped(t_info_simulation *info);
-t_coder    *scheduler(t_coder **waiting_queue, int remove_chosen_coder, t_info_simulation *infos);
+// INIT STRUCTS
+void		*init_info_simulation(t_info_simulation *info_simulation,
+				char **av);
+t_coder		*init_list_of_coders(t_info_simulation infos);
+t_coder		*create_coder(t_info_simulation infos, int coder_id);
 
-//LIST MANIPULATION
-void append_queue(t_coder **queue, t_coder *coder);
+// THREADS
+int			create_threads(t_info_simulation *infos);
+void		join_threads(t_info_simulation *info);
+void		*wakeup_all_threads(t_dongle **dongles);
 
-//THREADS ROUTINES
-void *thread_algoritm(void *infos);
-void *supervision(void *information);
-void    join_threads(t_info_simulation *info);
+// ACTIONS
+int			try_compile(t_coder *self,
+				t_info_simulation *info);
+int			debug_and_refactor(t_coder *self,
+				t_info_simulation *info);
+void		printl(char *message,
+				t_info_simulation *info, int coder_id);
+int			stopped(t_info_simulation *info);
+t_coder		*scheduler(t_coder **waiting_queue,
+				t_info_simulation *infos,
+				int remove_chosen_coder);
 
-//TIME
-void time_wait(int time_ms);
-int current_milliseconds(t_info_simulation *infos);
+// LIST MANIPULATION
+void		append_queue(t_coder **queue,
+				t_coder *coder);
+int			lst_append_new_coders(t_coder *coder,
+				t_info_simulation infos, int id_coder);
+
+// TIME
+void		times_wait(int time_ms);
+int			current_milliseconds(t_info_simulation *infos);

@@ -1,94 +1,107 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   actions.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/24 15:53:17 by dosorio-          #+#    #+#             */
+/*   Updated: 2026/08/24 21:53:08 by dosorio-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
-int stopped(t_info_simulation *info)
+static void	get_dongle(int coder_id, t_dongle *dongle, t_info_simulation *info)
 {
-    pthread_mutex_lock(&info->lock);
-    if (!info->running)
-    {
-        pthread_mutex_unlock(&info->lock);
-        return(-1);
-    }
-    pthread_mutex_unlock(&info->lock);
-    return (0);
+	dongle->owner = coder_id;
+	printl("%d %d has taken a dongle\n", info, coder_id);
 }
 
-static void get_dongle(int coder_id, t_dongle *dongle, t_info_simulation *info)
+static int	compile(t_coder *self, t_info_simulation *info)
 {
-    dongle->owner = coder_id;
-    printl("%d %d has taken a dongle\n", info, coder_id);
+	printl("%d %d is compiling\n", info, self->coder_id);
+	times_wait(info->time_to_compile);
+	pthread_mutex_lock(&self->thread_lock);
+	self->last_compile = current_milliseconds(info);
+	self->total_compiles++;
+	pthread_mutex_unlock(&self->thread_lock);
+	pthread_mutex_lock(&self->right_dongle->lock);
+	self->right_dongle->owner = 0;
+	self->right_dongle->released_ms = current_milliseconds(info);
+	pthread_cond_broadcast(&self->right_dongle->cond);
+	pthread_mutex_unlock(&self->right_dongle->lock);
+	pthread_mutex_lock(&self->left_dongle->lock);
+	self->left_dongle->owner = 0;
+	self->left_dongle->released_ms = current_milliseconds(info);
+	pthread_cond_broadcast(&self->left_dongle->cond);
+	pthread_mutex_unlock(&self->left_dongle->lock);
+	return (1);
 }
 
-static int compile(t_coder *self, t_info_simulation *info)
+static void	view_scheduler(t_coder *self, t_dongle *dongle,
+		t_info_simulation *info)
 {
-    printl("%d %d is compiling\n", info, self->coder_id);
-    time_wait(info->time_to_compile);
-    self->last_compile = current_milliseconds(info);
-    self->total_compiles++;
-
-    pthread_mutex_lock(&self->right_dongle->lock);
-    self->right_dongle->owner = 0;
-    self->right_dongle->released_ms = current_milliseconds(info);
-    pthread_cond_broadcast(&self->right_dongle->cond);
-    pthread_mutex_unlock(&self->right_dongle->lock);
-
-    pthread_mutex_lock(&self->left_dongle->lock);
-    self->left_dongle->owner = 0;
-    self->left_dongle->released_ms = current_milliseconds(info);
-    pthread_cond_broadcast(&self->left_dongle->cond);
-    pthread_mutex_unlock(&self->left_dongle->lock);
-
-    return (1);
+	if (scheduler(dongle->waiting_queue, info, 0) == self && !dongle->owner
+		&& (current_milliseconds(info) > dongle->released_ms
+			+ info->dongle_cooldown || !dongle->released_ms))
+		get_dongle(scheduler(dongle->waiting_queue, info, 1)->coder_id, dongle,
+			info);
+	else
+	{
+		append_queue(dongle->waiting_queue, self);
+		if (dongle->owner)
+			pthread_cond_wait(&dongle->cond, &dongle->lock);
+	}
 }
 
-static int try_get_dongle(t_coder *self, t_dongle *dongle, t_info_simulation *info)
+static int	try_get_dongle(t_coder *self, t_dongle *dongle,
+		t_info_simulation *info)
 {
-    if (stopped(info))
-        return (-1);
-    pthread_mutex_lock(&dongle->lock);
-    if (dongle->owner == self->coder_id)
-    {
-        pthread_mutex_unlock(&dongle->lock);
-        return (0);
-    }
-    else if (!dongle->owner && !dongle->waiting_queue[0] && (current_milliseconds(info) > dongle->released_ms + info->dongle_cooldown || !dongle->released_ms))
-        get_dongle(self->coder_id, dongle, info);
-    else
-    {
-        if (scheduler(dongle->waiting_queue, 0, info) == self && !dongle->owner && (current_milliseconds(info) > dongle->released_ms + info->dongle_cooldown || !dongle->released_ms))
-            get_dongle(scheduler(dongle->waiting_queue, 1, info)->coder_id, dongle, info);
-        else
-        {
-            append_queue(dongle->waiting_queue, self);
-            if (dongle->owner)
-                pthread_cond_wait(&dongle->cond, &dongle->lock);
-        }
-    }
-    pthread_mutex_unlock(&dongle->lock);
-    return (stopped(info));
+	if (stopped(info))
+		return (-1);
+	if (!dongle)
+		return (0);
+	pthread_mutex_lock(&dongle->lock);
+	if (dongle->owner == self->coder_id)
+	{
+		pthread_mutex_unlock(&dongle->lock);
+		return (0);
+	}
+	else if (!dongle->owner && !dongle->waiting_queue[0]
+		&& (current_milliseconds(info) > dongle->released_ms
+			+ info->dongle_cooldown || !dongle->released_ms))
+		get_dongle(self->coder_id, dongle, info);
+	else
+		view_scheduler(self, dongle, info);
+	pthread_mutex_unlock(&dongle->lock);
+	return (stopped(info));
 }
 
-int try_compile(t_coder *self, t_info_simulation *info)
+int	try_compile(t_coder *self, t_info_simulation *info)
 {
-    if (stopped(info))
-        return (-1);
-    
-    if (info->number_of_coders == self->coder_id)
-    {
-        if (try_get_dongle(self, self->right_dongle, info))
-            return (-1);
-        if (try_get_dongle(self, self->left_dongle, info))
-            return (-1);
-    }
-    else
-    {
-        if (try_get_dongle(self, self->left_dongle, info))
-            return (-1);
-        if (try_get_dongle(self, self->right_dongle, info))
-            return (-1);
-    }
-    if (stopped(info))
-        return (-1);
-    if (self->coder_id == self->left_dongle->owner && self->coder_id == self->right_dongle->owner)
-        return (compile(self, info));
-    return (0);
+	if (stopped(info))
+		return (-1);
+	if (info->number_of_coders == self->coder_id)
+	{
+		if (try_get_dongle(self, self->right_dongle, info))
+			return (-1);
+		if (try_get_dongle(self, self->left_dongle, info))
+			return (-1);
+	}
+	else
+	{
+		if (try_get_dongle(self, self->left_dongle, info))
+			return (-1);
+		if (try_get_dongle(self, self->right_dongle, info))
+			return (-1);
+	}
+	if (stopped(info))
+		return (-1);
+	if (!self->left_dongle || !self->right_dongle)
+		return (0);
+	if (self->coder_id == self->left_dongle->owner
+		&& self->coder_id == self->right_dongle->owner)
+		return (compile(self, info));
+	return (0);
 }

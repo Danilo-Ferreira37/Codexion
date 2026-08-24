@@ -1,104 +1,117 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   routine.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/24 15:52:53 by dosorio-          #+#    #+#             */
+/*   Updated: 2026/08/24 22:05:25 by dosorio-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
-void    join_threads(t_info_simulation *info)
+static void	*thread_algoritm(void *args)
 {
-    t_coder *tmp;
+	t_thread_args		*thread_args;
+	t_info_simulation	*info;
+	t_coder				*self;
+	int					cond;
 
-    pthread_join(info->supervisor->thread, NULL);
-    tmp = info->list_of_coders;
-    while (1)
-    {
-        pthread_join(tmp->thread, NULL);
-        if (tmp->coder_id == info->number_of_coders)
-            break;
-        tmp = tmp->right_coder;
-    }
-}
-
-void create_threads(t_info_simulation *infos)
-{
-    t_coder *thread;
-    t_thread_args *args;
-
-    pthread_create(&infos->supervisor->thread, NULL, supervision, infos);
-	thread = infos->list_of_coders;
-    while (1)
-    {
-        args = malloc(sizeof(t_thread_args));
-        args->coder = thread;
-        args->infos = infos;
-
-        pthread_create(&thread->thread, NULL, thread_algoritm, args);
-        if (thread->coder_id == infos->number_of_coders)
-            break;
-        thread = thread->right_coder;;
+	thread_args = (t_thread_args *)args;
+	self = thread_args->coder;
+	info = thread_args->infos;
+	free(args);
+	while (info->running)
+	{
+		if (self->total_compiles == info->number_of_compiles_required)
+			break ;
+		cond = try_compile(self, info);
+		if (cond == -1)
+			break ;
+		else if (cond)
+			if (debug_and_refactor(self, info))
+				break ;
 	}
+	pthread_mutex_lock(&info->lock);
+	info->qnty_coders_comp++;
+	pthread_mutex_unlock(&info->lock);
+	return (NULL);
 }
 
-void wakeup_all_threads(t_dongle **dongles)
+static int	thread_burnout(t_info_simulation *info, t_coder *coder)
 {
-    int i;
+	int	burnout;
 
-    i = -1;
-    while (dongles[++i])
-    {
-        pthread_mutex_lock(&dongles[i]->lock);
-        pthread_cond_broadcast(&dongles[i]->cond);
-        pthread_mutex_unlock(&dongles[i]->lock);
-    }
+	pthread_mutex_lock(&info->lock);
+	pthread_mutex_lock(&coder->thread_lock);
+	burnout = current_milliseconds(info)
+		- coder->last_compile >= info->time_to_burnout;
+	pthread_mutex_unlock(&coder->thread_lock);
+	if (burnout || info->qnty_coders_comp == info->number_of_coders)
+	{
+		info->running = 0;
+		if (burnout)
+			printf("%d %d burned out\n", current_milliseconds(info),
+				coder->coder_id);
+		pthread_mutex_unlock(&info->lock);
+		return (-1);
+	}
+	pthread_mutex_unlock(&info->lock);
+	return (0);
 }
 
-void *supervision(void *information)
+static void	*supervision(void *information)
 {
-    t_info_simulation *info;
-    t_coder *coder;
-    int burnout;
+	t_info_simulation	*info;
+	t_coder				*coder;
 
-    info = (t_info_simulation *) information;
-    coder = info->list_of_coders;
-    while (coder)
-    {
-        pthread_mutex_lock(&info->lock);
-        burnout = current_milliseconds(info) - coder->last_compile >= info->time_to_burnout;
-        if (burnout || info->qnty_coders_comp == info->number_of_coders)
-        {
-            info->running = 0;
-            if (burnout)
-                printf("%d %d burned out\n", current_milliseconds(info), coder->coder_id);
-            pthread_mutex_unlock(&info->lock);
-            break;
-        }
-        pthread_mutex_unlock(&info->lock);
-        coder = coder->right_coder;
-    }
-    wakeup_all_threads(info->dongles);
-    return (NULL);
+	info = (t_info_simulation *)information;
+	coder = info->list_of_coders;
+	while (coder)
+	{
+		if (thread_burnout(info, coder))
+			break ;
+		coder = coder->right_coder;
+		times_wait(5);
+	}
+	return (wakeup_all_threads(info->dongles));
 }
 
-void *thread_algoritm(void *args)
+int	create_threads(t_info_simulation *infos)
 {
-    t_thread_args *thread_args;
-    t_info_simulation *info;
-    t_coder *self;
-    int cond;
+	t_coder			*thread;
+	t_thread_args	*args;
 
-    thread_args = (t_thread_args *)args;
-    self = thread_args->coder;
-    info = thread_args->infos;
-    free(args);
-    while (info->running)
-    {
-        if (self->total_compiles == info->number_of_compiles_required)
-            break;
-        cond = try_compile(self, info);
-        if (cond == -1)
-            break;
-        else if (cond)
-            if (debug_and_refactor(self, info))
-                break;
-    }
-    pthread_mutex_lock(&info->lock);
-    info->qnty_coders_comp++;
-    pthread_mutex_unlock(&info->lock);
-    return (NULL);
+	pthread_create(&infos->supervisor->thread, NULL, supervision, infos);
+	thread = infos->list_of_coders;
+	while (1)
+	{
+		args = malloc(sizeof(t_thread_args));
+		if (!args)
+			return (error(NULL, infos));
+		args->coder = thread;
+		args->infos = infos;
+		pthread_create(&thread->thread, NULL, thread_algoritm, args);
+		if (thread->coder_id == infos->number_of_coders)
+			break ;
+		thread = thread->right_coder;
+	}
+	return (0);
+}
+
+void	join_threads(t_info_simulation *info)
+{
+	t_coder	*tmp;
+
+	pthread_join(info->supervisor->thread, NULL);
+	tmp = info->list_of_coders;
+	while (1)
+	{
+		pthread_join(tmp->thread, NULL);
+		if (tmp->coder_id == info->number_of_coders)
+			break ;
+		tmp = tmp->right_coder;
+	}
 }

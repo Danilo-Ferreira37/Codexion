@@ -1,13 +1,27 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2026/08/24 15:53:05 by dosorio-          #+#    #+#              #
+#    Updated: 2026/08/24 22:06:26 by dosorio-         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 NAME = codexion
 CCF = cc -Wall -Wextra -Werror -pthread
 SRCS =	codexion.c 		\
-		parsing.c 		\
+		parsing_clear.c \
 		init_structs.c 	\
 		actions.c 		\
 		actions_utils.c \
 		time.c			\
 		scheduler.c     \
-		routine.c
+		routine.c		\
+		routine_utils.c
+
 OBJS = $(SRCS:.c=.o)
 RM = @rm -f
 
@@ -31,6 +45,7 @@ re: fclean all
 
 r: all clean
 	clear
+
 help:
 	@echo "\033[35mAvailable Make commands:\033[0m"
 	@echo ""

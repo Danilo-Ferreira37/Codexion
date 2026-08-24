@@ -14,18 +14,3 @@ https://dev.to/pliniohr/threads-na-linguagem-c-598k
 ➜  Codexion git:(main) ✗ ccf -pthread *.c
 
 ➜  Codexion git:(main) ✗ valgrind --tool=helgrind --track-lockorders=yes ./a.out 8 8000 1000 500 500 1 3
-    //printf("\ntempo do comeco %d   tempo atual %d\n", infos->start_ms, current_ms);
-        if (info->number_of_coders == self->coder_id)
-    {
-        if (try_get_dongle(self, self->left_dongle, info))
-            return (-1);
-        if (try_get_dongle(self, self->right_dongle, info))
-            return (-1);
-    }
-    else
-    {
-        if (try_get_dongle(self, self->right_dongle, info))
-            return (-1);
-        if (try_get_dongle(self, self->left_dongle, info))
-            return (-1);
-    }
