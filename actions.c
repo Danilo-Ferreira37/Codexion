@@ -6,17 +6,11 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 15:53:17 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/24 22:22:02 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/25 17:36:49 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
-
-static void	get_dongle(int coder_id, t_dongle *dongle, t_info_simulation *info)
-{
-	dongle->owner = coder_id;
-	printl("%d %d has taken a dongle\n", info, coder_id);
-}
 
 static int	compile(t_coder *self, t_info_simulation *info)
 {
@@ -49,7 +43,6 @@ static void	view_scheduler(t_coder *self, t_dongle *dongle,
 			info);
 	else
 	{
-		// dongle_cooldown
 		append_queue(dongle->waiting_queue, self);
 		if (dongle->owner)
 			pthread_cond_wait(&dongle->cond, &dongle->lock);
@@ -79,30 +72,46 @@ static int	try_get_dongle(t_coder *self, t_dongle *dongle,
 	return (stopped(info));
 }
 
-int	try_compile(t_coder *self, t_info_simulation *info)
+static int	verify_compile(t_coder *self, t_dongle *first, t_dongle *second,
+		t_info_simulation *info)
 {
 	if (stopped(info))
 		return (-1);
-	if (info->number_of_coders == self->coder_id)
+	pthread_mutex_lock(&first->lock);
+	pthread_mutex_lock(&second->lock);
+	if (self->coder_id == first->owner && self->coder_id == second->owner)
 	{
-		if (try_get_dongle(self, self->right_dongle, info))
-			return (-1);
-		if (try_get_dongle(self, self->left_dongle, info))
-			return (-1);
+		pthread_mutex_unlock(&second->lock);
+		pthread_mutex_unlock(&first->lock);
+		return (compile(self, info));
 	}
-	else
-	{
-		if (try_get_dongle(self, self->left_dongle, info))
-			return (-1);
-		if (try_get_dongle(self, self->right_dongle, info))
-			return (-1);
-	}
+	pthread_mutex_unlock(&second->lock);
+	pthread_mutex_unlock(&first->lock);
+	return (0);
+}
+
+int	try_compile(t_coder *self, t_info_simulation *info)
+{
+	t_dongle	*first;
+	t_dongle	*second;
+
 	if (stopped(info))
 		return (-1);
 	if (!self->left_dongle || !self->right_dongle)
 		return (0);
-	if (self->coder_id == self->left_dongle->owner
-		&& self->coder_id == self->right_dongle->owner)
-		return (compile(self, info));
-	return (0);
+	if (self->left_dongle->dongle_id < self->right_dongle->dongle_id)
+	{
+		first = self->left_dongle;
+		second = self->right_dongle;
+	}
+	else
+	{
+		first = self->right_dongle;
+		second = self->left_dongle;
+	}
+	if (try_get_dongle(self, first, info))
+		return (-1);
+	if (try_get_dongle(self, second, info))
+		return (-1);
+	return (verify_compile(self, first, second, info));
 }

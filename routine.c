@@ -6,27 +6,26 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 15:52:53 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/24 22:05:25 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/25 17:10:08 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-static void	*thread_algoritm(void *args)
+static void	thread_algoritm_loop(t_info_simulation *info, t_coder *self)
 {
-	t_thread_args		*thread_args;
-	t_info_simulation	*info;
-	t_coder				*self;
-	int					cond;
+	int	cond;
 
-	thread_args = (t_thread_args *)args;
-	self = thread_args->coder;
-	info = thread_args->infos;
-	free(args);
-	while (info->running)
+	while (1)
 	{
-		if (self->total_compiles == info->number_of_compiles_required)
+		pthread_mutex_lock(&info->lock);
+		if (self->total_compiles == info->number_of_compiles_required
+			|| !info->running)
+		{
+			pthread_mutex_unlock(&info->lock);
 			break ;
+		}
+		pthread_mutex_unlock(&info->lock);
 		cond = try_compile(self, info);
 		if (cond == -1)
 			break ;
@@ -34,6 +33,19 @@ static void	*thread_algoritm(void *args)
 			if (debug_and_refactor(self, info))
 				break ;
 	}
+}
+
+static void	*thread_algoritm(void *args)
+{
+	t_thread_args		*thread_args;
+	t_info_simulation	*info;
+	t_coder				*self;
+
+	thread_args = (t_thread_args *)args;
+	self = thread_args->coder;
+	info = thread_args->infos;
+	free(args);
+	thread_algoritm_loop(info, self);
 	pthread_mutex_lock(&info->lock);
 	info->qnty_coders_comp++;
 	pthread_mutex_unlock(&info->lock);
@@ -99,19 +111,4 @@ int	create_threads(t_info_simulation *infos)
 		thread = thread->right_coder;
 	}
 	return (0);
-}
-
-void	join_threads(t_info_simulation *info)
-{
-	t_coder	*tmp;
-
-	pthread_join(info->supervisor->thread, NULL);
-	tmp = info->list_of_coders;
-	while (1)
-	{
-		pthread_join(tmp->thread, NULL);
-		if (tmp->coder_id == info->number_of_coders)
-			break ;
-		tmp = tmp->right_coder;
-	}
 }

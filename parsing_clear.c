@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 15:52:58 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/24 21:03:59 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/25 14:13:29 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ void	*clear_allocation(t_info_simulation *infos)
 		while (tmp)
 		{
 			next = tmp->right_coder;
+			pthread_mutex_destroy(&tmp->thread_lock);
 			free(tmp);
 			tmp = next;
 		}

@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 21:03:32 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/24 22:21:12 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/25 17:37:39 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,6 @@ typedef struct s_coder
 	struct s_coder					*right_coder;
 
 	long							last_compile;
-	int								died;
 	int								total_compiles;
 	pthread_t						thread;
 	pthread_mutex_t					thread_lock;
@@ -104,6 +103,8 @@ t_coder				*create_coder(t_info_simulation infos,
 int					create_threads(t_info_simulation *infos);
 void				join_threads(t_info_simulation *info);
 void				*wakeup_all_threads(t_dongle **dongles);
+void				get_dongle(int coder_id, t_dongle *dongle,
+						t_info_simulation *info);
 
 // ACTIONS
 int					try_compile(t_coder *self,
@@ -126,4 +127,3 @@ int					lst_append_new_coders(t_coder *coder,
 // TIME
 void				times_wait(int time_ms);
 int					current_milliseconds(t_info_simulation *infos);
-struct timespec		get_cooldwn(t_info_simulation *infos);
