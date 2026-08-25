@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 15:52:58 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/25 14:13:29 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/25 20:25:22 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,15 +100,19 @@ int	args_parse(char **av)
 	{
 		if (error_in_num(av[i]))
 			return (-1);
-		if (atoi(av[i]) <= 0)
+		if (i == 6 || i == 7)
+		{
+			if (atoi(av[i]) < 0)
+				return (error("The numerical arguments must be integers!",
+						NULL));
+		}
+		else if (atoi(av[i]) <= 0)
 			return (error("The numerical arguments must be positive integers!",
 					NULL));
 		i++;
 	}
 	if (strcmp(av[i], "fifo") && strcmp(av[i], "edf"))
-		return (
-			error
-			("The program received a invalid scheduling! "
+		return (error("The program received a invalid scheduling! "
 				"(Must be exactly 'fifo' or 'edf')",
 				NULL));
 	return (0);

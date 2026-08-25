@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 15:52:53 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/25 18:15:54 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/25 20:37:39 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,10 +58,12 @@ static int	thread_burnout(t_info_simulation *info, t_coder *coder)
 {
 	int	burnout;
 
+	burnout = 0;
 	pthread_mutex_lock(&info->lock);
 	pthread_mutex_lock(&coder->thread_lock);
-	burnout = current_milliseconds(info)
-		- coder->last_compile >= info->time_to_burnout;
+	if (coder->total_compiles != info->number_of_compiles_required)
+		burnout = current_milliseconds(info)
+			- coder->last_compile >= info->time_to_burnout;
 	pthread_mutex_unlock(&coder->thread_lock);
 	if (burnout || info->qnty_coders_comp == info->number_of_coders)
 	{
@@ -88,7 +90,7 @@ static void	*supervision(void *information)
 		if (thread_burnout(info, coder))
 			break ;
 		coder = coder->right_coder;
-		times_wait(5);
+		times_wait(1);
 	}
 	return (wakeup_all_threads(info->dongles));
 }

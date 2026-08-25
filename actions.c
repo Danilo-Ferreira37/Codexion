@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 15:53:17 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/25 17:36:49 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/25 20:50:38 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,11 @@
 static int	compile(t_coder *self, t_info_simulation *info)
 {
 	printl("%d %d is compiling\n", info, self->coder_id);
-	times_wait(info->time_to_compile);
 	pthread_mutex_lock(&self->thread_lock);
 	self->last_compile = current_milliseconds(info);
 	self->total_compiles++;
 	pthread_mutex_unlock(&self->thread_lock);
+	times_wait(info->time_to_compile);
 	pthread_mutex_lock(&self->right_dongle->lock);
 	self->right_dongle->owner = 0;
 	self->right_dongle->released_ms = current_milliseconds(info);
