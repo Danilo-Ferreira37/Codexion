@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 21:03:32 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/25 17:37:39 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/25 18:09:45 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,8 @@ int					create_threads(t_info_simulation *infos);
 void				join_threads(t_info_simulation *info);
 void				*wakeup_all_threads(t_dongle **dongles);
 void				get_dongle(int coder_id, t_dongle *dongle,
+						t_info_simulation *info);
+int					verify_1_coder(t_coder *self,
 						t_info_simulation *info);
 
 // ACTIONS

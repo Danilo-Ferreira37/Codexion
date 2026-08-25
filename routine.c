@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 15:52:53 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/25 17:10:08 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/25 18:15:54 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ static void	*thread_algoritm(void *args)
 	self = thread_args->coder;
 	info = thread_args->infos;
 	free(args);
+	if (verify_1_coder(self, info))
+		return (NULL);
 	thread_algoritm_loop(info, self);
 	pthread_mutex_lock(&info->lock);
 	info->qnty_coders_comp++;
