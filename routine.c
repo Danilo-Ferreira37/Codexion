@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 15:52:53 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/25 20:37:39 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/25 21:49:59 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,9 @@ static void	thread_algoritm_loop(t_info_simulation *info, t_coder *self)
 
 	while (1)
 	{
+		cond = try_compile(self, info);
+		if (cond == -1)
+			break ;
 		pthread_mutex_lock(&info->lock);
 		if (self->total_compiles == info->number_of_compiles_required
 			|| !info->running)
@@ -26,10 +29,7 @@ static void	thread_algoritm_loop(t_info_simulation *info, t_coder *self)
 			break ;
 		}
 		pthread_mutex_unlock(&info->lock);
-		cond = try_compile(self, info);
-		if (cond == -1)
-			break ;
-		else if (cond)
+		if (cond)
 			if (debug_and_refactor(self, info))
 				break ;
 	}
@@ -67,10 +67,10 @@ static int	thread_burnout(t_info_simulation *info, t_coder *coder)
 	pthread_mutex_unlock(&coder->thread_lock);
 	if (burnout || info->qnty_coders_comp == info->number_of_coders)
 	{
-		info->running = 0;
 		if (burnout)
 			printf("%d %d burned out\n", current_milliseconds(info),
 				coder->coder_id);
+		info->running = 0;
 		pthread_mutex_unlock(&info->lock);
 		return (-1);
 	}

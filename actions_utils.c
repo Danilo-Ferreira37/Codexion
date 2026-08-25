@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 15:53:20 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/24 21:03:42 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/25 21:36:30 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,14 +28,12 @@ int	debug_and_refactor(t_coder *self, t_info_simulation *info)
 void	printl(char *message, t_info_simulation *info, int coder_id)
 {
 	pthread_mutex_lock(&info->lock);
-	if (!info->running)
+	if (info->running)
 	{
-		pthread_mutex_unlock(&info->lock);
-		return ;
+		pthread_mutex_lock(&info->printl->lock);
+		info->printl->print(message, current_milliseconds(info), coder_id);
+		pthread_mutex_unlock(&info->printl->lock);
 	}
-	pthread_mutex_lock(&info->printl->lock);
-	info->printl->print(message, current_milliseconds(info), coder_id);
-	pthread_mutex_unlock(&info->printl->lock);
 	pthread_mutex_unlock(&info->lock);
 }
 
