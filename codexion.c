@@ -17,7 +17,11 @@ int	main(int ac, char **av)
 	t_info_simulation	info_simulation;
 
 	if (ac != 9)
-		return (error("Invalid number of arguments!", NULL));
+		return (error("Invalid number of arguments!"
+					" The program must be excuted in this order: "
+					"./codexion number_of_coders time_to_burnout time_to_compile"
+					" time_to_debug time_to_refactor number_of_compiles_required "
+					"dongle_cooldown scheduler ", NULL));
 	if (args_parse(av))
 		return (-1);
 	if (!init_info_simulation(&info_simulation, av))

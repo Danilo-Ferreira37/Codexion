@@ -100,14 +100,18 @@ int	args_parse(char **av)
 	{
 		if (error_in_num(av[i]))
 			return (-1);
-		if (i == 6 || i == 7)
+		if (i == 5 || i == 7 || i == 4 || i == 3)
 		{
 			if (atoi(av[i]) < 0)
-				return (error("The numerical arguments must be integers!",
-						NULL));
+				return (error("The numerical arguments must be positive integers! " 
+						"(time_to_compile, "
+						"time_to_debug, time_to_refactor, dongle_cooldown can be 0)",
+                        NULL));
 		}
 		else if (atoi(av[i]) <= 0)
-			return (error("The numerical arguments must be positive integers!",
+			return (error("The numerical arguments must be positive integers! " 
+					"(time_to_compile, "
+					"time_to_debug, time_to_refactor, dongle_cooldown can be 0)",
 					NULL));
 		i++;
 	}
