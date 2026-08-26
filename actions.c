@@ -36,6 +36,8 @@ static int	compile(t_coder *self, t_info_simulation *info)
 static void	view_scheduler(t_coder *self, t_dongle *dongle,
 		t_info_simulation *info)
 {
+    struct timespec	deadline;
+
 	if (scheduler(dongle->waiting_queue, info, 0) == self && !dongle->owner
 		&& (current_milliseconds(info) > dongle->released_ms
 			+ info->dongle_cooldown || !dongle->released_ms))
@@ -46,6 +48,11 @@ static void	view_scheduler(t_coder *self, t_dongle *dongle,
 		append_queue(dongle->waiting_queue, self);
 		if (dongle->owner)
 			pthread_cond_wait(&dongle->cond, &dongle->lock);
+		else if (dongle->released_ms)
+		{
+			deadline = get_cooldown_deadline(dongle, info);
+			pthread_cond_timedwait(&dongle->cond, &dongle->lock, &deadline);
+		}
 	}
 }
 

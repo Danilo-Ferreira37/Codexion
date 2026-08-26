@@ -133,5 +133,3 @@ both, protecting against another thread reclaiming a dongle in between.
 this README from the existing source code and design, to the documentation and to help with debugging. All concurrency
 design and implementation (dongle ordering, scheduler, cooldown, burnout
 detection, synchronization) was done by the author.
-
-

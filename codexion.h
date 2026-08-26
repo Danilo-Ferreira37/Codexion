@@ -129,3 +129,5 @@ int					lst_append_new_coders(t_coder *coder,
 // TIME
 void				times_wait(int time_ms);
 int					current_milliseconds(t_info_simulation *infos);
+struct timespec		get_cooldown_deadline(t_dongle *dongle,
+						t_info_simulation *infos);
