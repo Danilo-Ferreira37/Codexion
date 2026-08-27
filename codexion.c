@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 15:53:13 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/27 14:52:16 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/27 15:07:07 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	main(int ac, char **av)
 		return (error("Memory allocation failure!", NULL));
 	info_simulation.list_of_coders = init_list_of_coders(info_simulation);
 	if (!info_simulation.list_of_coders)
-		return (error("Memory allocation failure!", NULL));
+		return (error("Memory allocation failure!", &info_simulation));
 	if (create_threads(&info_simulation))
 		return (error("Memory allocation failure!", &info_simulation));
 	join_threads(&info_simulation);
