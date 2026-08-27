@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 21:03:32 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/25 18:09:45 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/27 14:46:58 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,6 @@ typedef struct s_supervisor
 	pthread_t						thread;
 }									t_supervisor;
 
-// mudar pra long
 typedef struct s_info_simulation
 {
 	int								number_of_coders;

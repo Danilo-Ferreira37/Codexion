@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 15:53:20 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/25 21:36:30 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/27 14:46:37 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,7 @@ void	append_queue(t_coder **queue, t_coder *coder)
 		queue[0] = coder;
 }
 
-int	lst_append_new_coders(t_coder *coder, t_info_simulation infos,
-		int id_coder)
+int	lst_append_new_coders(t_coder *coder, t_info_simulation infos, int id_coder)
 {
 	t_coder	*next_coder;
 	t_coder	*tmp;

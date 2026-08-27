@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 15:53:13 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/24 21:03:48 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/27 14:52:16 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,11 @@ int	main(int ac, char **av)
 
 	if (ac != 9)
 		return (error("Invalid number of arguments!"
-					" The program must be excuted in this order: "
-					"./codexion number_of_coders time_to_burnout time_to_compile"
-					" time_to_debug time_to_refactor number_of_compiles_required "
-					"dongle_cooldown scheduler ", NULL));
+				" The program must be excuted in this order: "
+				"./codexion number_of_coders time_to_burnout time_to_compile"
+				" time_to_debug time_to_refactor number_of_compiles_required "
+				"dongle_cooldown scheduler ",
+				NULL));
 	if (args_parse(av))
 		return (-1);
 	if (!init_info_simulation(&info_simulation, av))

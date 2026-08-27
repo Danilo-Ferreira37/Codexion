@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 15:52:58 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/25 20:25:22 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/27 14:59:42 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,15 +103,12 @@ int	args_parse(char **av)
 		if (i == 5 || i == 7 || i == 4 || i == 3)
 		{
 			if (atoi(av[i]) < 0)
-				return (error("The numerical arguments must be positive integers! " 
-						"(time_to_compile, "
-						"time_to_debug, time_to_refactor, dongle_cooldown can be 0)",
-                        NULL));
+				return (error("The numerical arguments must"
+						"be integers!",
+						NULL));
 		}
 		else if (atoi(av[i]) <= 0)
-			return (error("The numerical arguments must be positive integers! " 
-					"(time_to_compile, "
-					"time_to_debug, time_to_refactor, dongle_cooldown can be 0)",
+			return (error("The numerical arguments must be integers!",
 					NULL));
 		i++;
 	}

@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 15:53:17 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/25 20:50:38 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/27 14:46:40 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static int	compile(t_coder *self, t_info_simulation *info)
 static void	view_scheduler(t_coder *self, t_dongle *dongle,
 		t_info_simulation *info)
 {
-    struct timespec	deadline;
+	struct timespec	deadline;
 
 	if (scheduler(dongle->waiting_queue, info, 0) == self && !dongle->owner
 		&& (current_milliseconds(info) > dongle->released_ms

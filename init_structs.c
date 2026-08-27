@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 15:53:08 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/24 21:29:26 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/08/27 14:46:53 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ static void	init_info_simulation_utils(t_info_simulation *infos, char **av)
 
 void	*init_info_simulation(t_info_simulation *infos, char **av)
 {
-	int				i;
+	int	i;
 
 	init_info_simulation_utils(infos, av);
 	infos->dongles = malloc((infos->number_of_coders + 1) * sizeof(t_dongle *));

@@ -38,16 +38,16 @@ Other Makefile commands:
 ./codexion number_of_coders time_to_burnout time_to_compile time_to_debug time_to_refactor number_of_compiles_required dongle_cooldown scheduler
 ```
 
-| Argument                      | Meaning                                                                            |
-|-------------------------------|---------------------------------------------------------------------------------------|
-| `number_of_coders`            | How many coders (threads) join the simulation.                                       |
-| `time_to_burnout`             | Max time (ms) a coder can go without compiling before it burns out and the sim stops. |
-| `time_to_compile`             | Time (ms) a compile takes.                                                           |
-| `time_to_debug`               | Time (ms) spent debugging.                                                           |
-| `time_to_refactor`            | Time (ms) spent refactoring.                                                         |
-| `number_of_compiles_required` | How many compiles each coder must reach for the simulation to succeed.               |
-| `dongle_cooldown`             | Time (ms) a released dongle must stay idle before it can be picked up again.          |
-| `scheduler`                   | Policy used to resolve contention on a dongle: `fifo` or `edf` (see below).           |
+| Argument                      | Meaning                                                                                             |
+|-------------------------------|-----------------------------------------------------------------------------------------------------|
+| `number_of_coders`            | How many coders (threads) join the simulation. (cannot be 0)                                        |
+| `time_to_burnout`             | Max time (ms) a coder can go without compiling before it burns out and the sim stops.  (cannot be 0)|
+| `time_to_compile`             | Time (ms) a compile takes.                                                                          |
+| `time_to_debug`               | Time (ms) spent debugging.                                                                          |
+| `time_to_refactor`            | Time (ms) spent refactoring.                                                                        |
+| `number_of_compiles_required` | How many compiles each coder must reach for the simulation to succeed. (cannot be 0)                |
+| `dongle_cooldown`             | Time (ms) a released dongle must stay idle before it can be picked up again.                        |
+| `scheduler`                   | Policy used to resolve contention on a dongle: `fifo` or `edf` (see below).                         |
 
 All numeric arguments must be positive integers.
 
