@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 21:54:27 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/25 18:43:27 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/09/08 16:59:52 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,7 @@ int	verify_1_coder(t_coder *self, t_info_simulation *info)
 	{
 		pthread_mutex_lock(&self->right_dongle->lock);
 		self->right_dongle->owner = self->coder_id;
-		printf("%d %d has taken a dongle\n", current_milliseconds(info),
-			self->coder_id);
+		printl("%d %d has taken a dongle\n", info, self->coder_id);
 		pthread_mutex_unlock(&self->right_dongle->lock);
 		return (1);
 	}

@@ -6,7 +6,7 @@
 #    By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/24 15:53:05 by dosorio-          #+#    #+#              #
-#    Updated: 2026/08/24 22:06:26 by dosorio-         ###   ########.fr        #
+#    Updated: 2026/08/27 18:07:40 by dosorio-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -60,3 +60,6 @@ help:
 	@echo "Use \033[33mmake help\033[0m to see all available commands."
 
 .PHONY: all clean fclean re .DEFAULT help
+
+test:
+	valgrind --tool=helgrind ./codexion 200 20000 200 200 200 3 100 fifo > out.txt
