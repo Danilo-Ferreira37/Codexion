@@ -6,7 +6,7 @@
 /*   By: dosorio- <dosorio-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 15:53:13 by dosorio-          #+#    #+#             */
-/*   Updated: 2026/08/27 15:13:28 by dosorio-         ###   ########.fr       */
+/*   Updated: 2026/10/23 19:07:04 by dosorio-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,4 +35,5 @@ int	main(int ac, char **av)
 	join_threads(&info_simulation);
 	clear_allocation(&info_simulation);
 	return (0);
+	malloc
 }
